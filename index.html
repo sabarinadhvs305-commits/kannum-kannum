@@ -37,13 +37,9 @@
       </header>
 
       <nav class="app-nav" aria-label="Game navigation">
-        <button class="nav-link active" data-view="dashboard">DASHBOARD</button>
-        <button class="nav-link" data-view="play">PLAY</button>
+        <button class="nav-link active" data-view="play">PLAY</button>
         <button class="nav-link" data-view="collection">EYE COLLECTION</button>
-        <button class="nav-link" data-view="leaderboard">LEADERBOARD</button>
         <button class="nav-link" data-view="stats">STATS</button>
-        <button class="nav-link" data-view="history">GAME HISTORY</button>
-        <button class="nav-link login-link" id="login-button">LOGIN</button>
       </nav>
 
       <!-- Dynamic Views Section -->
@@ -134,31 +130,6 @@
     </div>
 
     <!-- Modals -->
-    <div class="modal hidden" id="login-modal" aria-modal="true" role="dialog">
-      <div class="modal-card login-card">
-        <div class="eyebrow" id="auth-eyebrow">Player pass</div>
-        <h2 id="auth-title">Who is staring?</h2>
-        <p class="intro-copy" id="auth-copy">
-          Create or sign into a local profile. Passwords never leave this browser.
-        </p>
-        
-        <label class="mono" for="player-name">USERNAME</label>
-        <input class="sketch-input" id="player-name" maxlength="18" placeholder="e.g. Eye-vin" />
-        
-        <label class="mono" for="player-email">EMAIL</label>
-        <input class="sketch-input" id="player-email" type="email" placeholder="you@example.com" />
-        
-        <label class="mono" for="player-password">PASSWORD</label>
-        <input class="sketch-input" id="player-password" type="password" minlength="4" placeholder="4+ characters" />
-        
-        <div class="modal-actions">
-          <button class="primary" id="save-login">CREATE PROFILE</button>
-          <button class="ghost" id="switch-auth">I HAVE AN ACCOUNT</button>
-          <button class="ghost" id="close-login">CANCEL</button>
-        </div>
-      </div>
-    </div>
-
     <div class="modal hidden" id="style-modal" aria-modal="true" role="dialog">
       <div class="modal-card">
         <div class="eyebrow">Target selection</div>
@@ -219,7 +190,6 @@
     </div>
 
     <!-- Scripts -->
-    <script src="supabase-config.js"></script>
     <script type="module" src="game.js"></script>
   </body>
 </html>
