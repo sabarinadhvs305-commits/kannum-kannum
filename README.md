@@ -1,126 +1,116 @@
-# Kannum Kannum
-
-> A gaze endurance game: keep looking at the center eye while the game does everything it can to distract you.
-
-**Live demo:** Add the deployed URL here after launch.
+<img width="1280" height="640" alt="git (1)" src="https://github.com/user-attachments/assets/8920b256-2ba8-4988-b824-5351134eb4bd" />
 
 ![Kannum Kannum logo](gpt-image-2_create_a_funny_doodle_like_logo_with_title_%E0%B4%95%E0%B4%A3%E0%B5%8D%E0%B4%A3%E0%B5%81%E0%B4%82_%E0%B4%95%E0%B4%A3%E0%B5%8D%E0%B4%A3%E0%B5%81%E0%B4%82-0.jpg)
 
-## About
 
-Kannum Kannum uses your webcam and MediaPipe face landmarks to tell whether your gaze remains on the target. A round ends when you look away or blink for too long. The longer you hold on, the higher your score and level.
+## Basic Details
+### Team Name: Nisaa
 
-Camera analysis runs entirely in the browser. Video is not recorded or uploaded by the game.
 
-## Features
+### Team Members
+- Team Lead: Neehara Anna Bince - Model Engineering College,Cochin
+- Member 2: Sabarinadh V S - Model Engineering College,Cochin
 
-- Real-time gaze and blink detection with MediaPipe Face Landmarker
-- Calibration before each round for more reliable tracking
-- Increasing levels, distractions, and best-run stats
-- Unlockable eye styles plus custom-eye uploads
-- No accounts, logins, or online leaderboard
-- A small jump-scare finale for distraction
 
-## Tech Stack
+### Project Description
+Kannum Kannum is a gaze-endurance browser game where the player must keep looking at a target while the game tries to distract them. It uses the device camera and MediaPipe face landmarks to detect gaze changes and blinks in real time.
 
-- HTML, CSS, and vanilla JavaScript
-- [MediaPipe Tasks Vision](https://ai.google.dev/edge/mediapipe/solutions/vision/face_landmarker/web_js) for browser-side face landmarks
-- Browser `localStorage` for device-local best-score and best-level stats
+## The Problem (that doesn't exist)
+People keep looking away from screens at the exact moment they are challenged not to. Kannum Kannum turns that familiar lack of focus into a competitive game.
 
-## Deploy
+### The Solution (that nobody asked for)
+We point a camera at the player, track their face and eye direction in the browser, and introduce increasingly distracting prompts. Look away, blink at the wrong moment, or lose focus for too long and the run ends.
 
-Kannum Kannum is a static web application: there is no build step or server runtime. The deployment host must provide HTTPS because browsers only allow webcam access from secure origins. `localhost` is also accepted for development.
+## Technical Details
+### Technologies/Components Used
+For Software:
+- HTML, CSS, and JavaScript (ES modules)
+- MediaPipe Tasks Vision Face Landmarker
+- Supabase Auth and Postgres (optional online features)
+- Browser MediaDevices API for camera access
+- CDN imports from jsDelivr and esm.sh
+- GitHub Pages, Netlify, or Vercel for static hosting
 
-### 1. Publish the Project with Netlify
+For Hardware:
+- A desktop or mobile device with a front-facing camera
+- A modern browser with camera permissions enabled
+- No additional hardware is required
 
-Netlify is the simplest route for this repository because it serves static files directly and automatically provides HTTPS.
+### Implementation
+For Software:
+# Installation
+This project has no build step or package installation. Clone or download the repository and serve the project directory through a local HTTP server.
 
-1. Create a new GitHub repository and push this project to it:
 
-   ```powershell
-   git init
-   git add .
-   git commit -m "Initial Kannum Kannum deployment"
-   git branch -M main
-   git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPOSITORY.git
-   git push -u origin main
-   ```
 
-2. Sign in to [Netlify](https://app.netlify.com/) with GitHub.
-3. Choose **Add new project > Import an existing project**, then select the repository.
-4. Use these deployment settings:
-
-   | Setting | Value |
-   | --- | --- |
-   | Branch to deploy | `main` |
-   | Build command | Leave empty |
-   | Publish directory | `.` |
-
-5. Select **Deploy site**. Netlify will provide an HTTPS URL such as `https://your-site.netlify.app`.
-6. Open that URL, allow camera access, and play one round to confirm gaze tracking works.
-
-Every later push to `main` triggers a new deployment automatically.
-
-### Alternative Hosts
-
-- **Vercel:** Import the GitHub repository, leave the framework preset as **Other**, leave the build command empty, and set the output directory to `.`.
-- **Cloudflare Pages:** Connect the repository, choose **None** as the framework preset, leave the build command empty, and set the build output directory to `.`.
-- **GitHub Pages:** In the GitHub repository, open **Settings > Pages**, choose **Deploy from a branch**, and select `main` with the `/ (root)` folder.
-
-### Launch Checklist
-
-- Replace the **Live demo** placeholder above with the production URL.
-- Open the deployed HTTPS site on desktop and mobile, allow camera access, and complete a round.
-- Play a round and confirm that the local best score and level update.
-- Confirm the browser displays the camera-permission prompt and that no production page is served through HTTP.
-
-## Run Locally
-
-For local testing, serve the project directory instead of opening `index.html` directly:
-
-```powershell
-npx serve .
-```
-
-Or:
-
-```powershell
+```bash
+git clone <repository-url>
+cd kannum-kannum
 python -m http.server 8000
 ```
 
-Open the URL printed by the server, then allow camera access when prompted.
 
-## Project Structure
+Open `http://localhost:8000` in a modern browser. Opening `index.html` directly may prevent camera access because browsers restrict camera APIs on insecure `file://` pages.
 
-| File | Purpose |
-| --- | --- |
-| `index.html` | Game interface, navigation, modals, and webcam element |
-| `styles.css` | Responsive doodle-style visual design and game effects |
-| `game.js` | Gaze tracking, calibration, game flow, and scoring |
-| `assets/jumpscare.png` | End-of-round scare graphic |
+# Run
+1. Open the deployed site or local server URL.
+2. Allow camera access when the browser asks for permission.
+3. Press **START**, complete the short calibration, and keep your gaze on the target.
+4. Use **EYE STYLE** and **SETTINGS** before starting a run when needed.
 
-## How It Works
+### Project Documentation
+For Software:
 
-1. The browser requests webcam permission when a game begins.
-2. MediaPipe derives eye-iris and head-position landmarks from the live video.
-3. Calibration records your neutral, center-facing gaze.
-4. During play, the app compares new landmark positions against that baseline.
-5. Looking away or keeping your eyes closed beyond the selected tolerance ends the run and saves the result.
+# Screenshots
+![Kannum Kannum dashboard](screenshots/Screenshot%202026-09-05%20055803.png)
+*Dashboard view showing the player's current doodle, best run, and quick links. Screenshot captured from the Kannum Kannum application.*
 
-## Privacy
+![Kannum Kannum play screen](screenshots/Screenshot%202026-09-05%20055824.png)
+*Play view showing the gaze target, camera status, score panel, and start controls. Screenshot captured from the Kannum Kannum application.*
+
+![Kannum Kannum eye collection](screenshots/Screenshot%202026-09-05%20060109.png)
+*Eye Collection view showing the available Human, Cyclops, Anime, and Alien target styles. Screenshot captured from the Kannum Kannum application.*
+
+![Kannum Kannum leaderboard](screenshots/Screenshot%202026-09-05%20060119.png)
+*Leaderboard view showing local player scores and the leaderboard rules. Screenshot captured from the Kannum Kannum application.*
+
+
+
+![Kannum Kannum stats](screenshots/Screenshot%202026-09-05%20060129.png)
+*Stats view showing survival time, best level, and total logged runs. Screenshot captured from the Kannum Kannum application.*
+
+![Kannum Kannum game history](screenshots/Screenshot%202026-09-05%20060140.png)
+*Game History view showing recent runs and the reasons each run ended. Screenshot captured from the Kannum Kannum application.*
+
+*Image source: screenshots captured by the Kannum Kannum project team and stored in the repository's `screenshots/` directory.*
+
+# Diagrams
+![Kannum Kannum workflow diagram](assets/workflow-diagram.svg)
+*The browser loads the static game, MediaPipe processes camera landmarks locally, and Supabase is used only when online persistence is configured.*
 
 - Webcam frames are processed in the browser for real-time tracking.
 - The application does not implement video recording or video uploads.
 - Best score and best level stay only in this browser's local storage.
+### Project Demo
+# Video
+[Watch the Kannum Kannum demo video](assets/demo.mp4)
+*The demo shows camera calibration, a complete gaze-endurance run, distraction detection, and the score screen.*
 
-## Troubleshooting
+# Additional Demos
+[Add the deployed site URL, presentation, or additional demo materials here]
 
-| Issue | What to check |
-| --- | --- |
+
 | The camera does not start | Allow camera permission and open the site through `localhost` or HTTPS, not directly from the file system. |
 | Gaze detection feels inaccurate | Keep your face well lit, stay centered in the preview, and complete calibration while looking at the dot. |
 | Scores are missing on another device | Best scores are stored only in the current browser and do not sync between devices. |
 
-## Team
+## Team Contributions
+- Neehara Anna Bince: Game concept, interaction design, and frontend implementation
+- Sabarinadh V S: Camera-based gaze detection and gameplay logic. Supabase integration, testing, and deployment
 
-Built for TinkerHub Useless Projects.
+
+---
+Made with ❤️ at TinkerHub Useless Projects 
+
+![Static Badge](https://img.shields.io/badge/TinkerHub-24?color=%23000000&link=https%3A%2F%2Fwww.tinkerhub.org%2F)
+![Static Badge](https://img.shields.io/badge/UselessProjects--26-26?link=https%3A%2F%2Ftinkerhub.org%2Fevents%2F1M8ORET9A1%2Fuseless-projects-3.0)
