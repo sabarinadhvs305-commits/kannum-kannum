@@ -1,166 +1,106 @@
-# Kannum Kannum
-
-> A gaze endurance game: keep looking at the center eye while the game does everything it can to distract you.
-
-**Live demo:** Add the deployed URL here after launch.
+<img width="1280" height="640" alt="git (1)" src="https://github.com/user-attachments/assets/8920b256-2ba8-4988-b824-5351134eb4bd" />
 
 ![Kannum Kannum logo](gpt-image-2_create_a_funny_doodle_like_logo_with_title_%E0%B4%95%E0%B4%A3%E0%B5%8D%E0%B4%A3%E0%B5%81%E0%B4%82_%E0%B4%95%E0%B4%A3%E0%B5%8D%E0%B4%A3%E0%B5%81%E0%B4%82-0.jpg)
 
-## About
+# Kannum Kannum
 
-Kannum Kannum uses your webcam and MediaPipe face landmarks to tell whether your gaze remains on the target. A round ends when you look away or blink for too long. The longer you hold on, the higher your score and level.
 
-Camera analysis runs entirely in the browser. Video is not recorded or uploaded by the game.
+## Basic Details
+### Team Name: Nisaa
 
-## Features
 
-- Real-time gaze and blink detection with MediaPipe Face Landmarker
-- Calibration before each round for more reliable tracking
-- Increasing levels, distractions, score history, and best-run stats
-- Unlockable eye styles plus custom-eye uploads
-- Browser-local player profiles and leaderboard out of the box
-- Optional Supabase authentication, persistent run history, and shared leaderboard
-- A small jump-scare finale for distraction
+### Team Members
+- Team Lead: Neehara Anna Bince - Model Engineering College,Cochin
+- Member 2: Sabarinadh V S - Model Engineering College,Cochin
 
-## Tech Stack
 
-- HTML, CSS, and vanilla JavaScript
-- [MediaPipe Tasks Vision](https://ai.google.dev/edge/mediapipe/solutions/vision/face_landmarker/web_js) for browser-side face landmarks
-- [Supabase](https://supabase.com/) for the optional hosted backend
-- Supabase JavaScript client, loaded from ESM
+### Project Description
+Kannum Kannum is a gaze-endurance browser game where the player must keep looking at a target while the game tries to distract them. It uses the device camera and MediaPipe face landmarks to detect gaze changes and blinks in real time.
 
-## Deploy
+Players can choose different eye styles, adjust the look-away tolerance, view their stats and game history, and share a score after a run. The game works locally with browser storage and can optionally use Supabase for accounts, saved runs, and a shared leaderboard.
 
-Kannum Kannum is a static web application: there is no build step or server runtime. The deployment host must provide HTTPS because browsers only allow webcam access from secure origins. `localhost` is also accepted for development.
+### The Problem (that doesn't exist)
+People keep looking away from screens at the exact moment they are challenged not to. Kannum Kannum turns that familiar lack of focus into a competitive game.
 
-### 1. Prepare the Production Backend
+### The Solution (that nobody asked for)
+We point a camera at the player, track their face and eye direction in the browser, and introduce increasingly distracting prompts. Look away, blink at the wrong moment, or lose focus for too long and the run ends.
 
-The game works without a backend, but player data then stays only in each browser's `localStorage`. Complete these steps before deploying if you want accounts, a shared leaderboard, and persistent run history:
+## Technical Details
+### Technologies/Components Used
+For Software:
+- HTML, CSS, and JavaScript (ES modules)
+- MediaPipe Tasks Vision Face Landmarker
+- Supabase Auth and Postgres (optional online features)
+- Browser MediaDevices API for camera access
+- CDN imports from jsDelivr and esm.sh
+- GitHub Pages, Netlify, or Vercel for static hosting
 
-1. Create a Supabase project.
-2. Run the contents of [`supabase-schema.sql`](supabase-schema.sql) in the Supabase SQL Editor.
-3. In [`supabase-config.js`](supabase-config.js), add the project URL and anon key from **Project Settings > API**:
+For Hardware:
+- A desktop or mobile device with a front-facing camera
+- A modern browser with camera permissions enabled
+- No additional hardware is required
 
-   ```js
-   window.KK_SUPABASE_CONFIG = {
-     url: "https://your-project.supabase.co",
-     anonKey: "your-anon-key",
-   };
-   ```
+### Implementation
+For Software:
+# Installation
+This project has no build step or package installation. Clone or download the repository and serve the project directory through a local HTTP server.
 
-4. Save the file. The Supabase URL and anon key are public browser configuration, so never place a service-role key in this project.
-
-At this point, the application has its production backend configuration. After the website is deployed, finish the authentication settings in step 3 below.
-
-The schema enables Row Level Security. Players can add and read their own runs, while the leaderboard is returned through the `get_leaderboard` database function.
-
-### 2. Publish the Project with Netlify
-
-Netlify is the simplest route for this repository because it serves static files directly and automatically provides HTTPS.
-
-1. Create a new GitHub repository and push this project to it:
-
-   ```powershell
-   git init
-   git add .
-   git commit -m "Initial Kannum Kannum deployment"
-   git branch -M main
-   git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPOSITORY.git
-   git push -u origin main
-   ```
-
-2. Sign in to [Netlify](https://app.netlify.com/) with GitHub.
-3. Choose **Add new project > Import an existing project**, then select the repository.
-4. Use these deployment settings:
-
-   | Setting | Value |
-   | --- | --- |
-   | Branch to deploy | `main` |
-   | Build command | Leave empty |
-   | Publish directory | `.` |
-
-5. Select **Deploy site**. Netlify will provide an HTTPS URL such as `https://your-site.netlify.app`.
-6. Open that URL, allow camera access, and play one round to confirm gaze tracking works.
-
-Every later push to `main` triggers a new deployment automatically.
-
-### 3. Finish Supabase for the Deployed Site
-
-Skip this section when using local-only profiles.
-
-1. In Supabase, open **Authentication > URL Configuration**.
-2. Set **Site URL** to the Netlify HTTPS URL.
-3. Add the same URL to **Redirect URLs**. Add a custom domain too if you use one.
-4. Under **Authentication > Providers**, enable and configure Email authentication.
-5. On the deployed site, create a test account, sign in, finish a game, and confirm the leaderboard displays the result.
-
-### Alternative Hosts
-
-- **Vercel:** Import the GitHub repository, leave the framework preset as **Other**, leave the build command empty, and set the output directory to `.`.
-- **Cloudflare Pages:** Connect the repository, choose **None** as the framework preset, leave the build command empty, and set the build output directory to `.`.
-- **GitHub Pages:** In the GitHub repository, open **Settings > Pages**, choose **Deploy from a branch**, and select `main` with the `/ (root)` folder. Use the generated HTTPS URL in the Supabase settings above.
-
-### Launch Checklist
-
-- Replace the **Live demo** placeholder above with the production URL.
-- Confirm `supabase-config.js` contains the correct project URL and anon key if using Supabase.
-- Confirm the deployed domain is listed in Supabase Auth redirect URLs.
-- Open the deployed HTTPS site on desktop and mobile, allow camera access, and complete a round.
-- Test account creation, login, score saving, and the leaderboard when Supabase is enabled.
-- Confirm the browser displays the camera-permission prompt and that no production page is served through HTTP.
-
-## Run Locally
-
-For local testing, serve the project directory instead of opening `index.html` directly:
-
-```powershell
-npx serve .
-```
-
-Or:
-
-```powershell
+```bash
+git clone <repository-url>
+cd kannum-kannum
 python -m http.server 8000
 ```
 
-Open the URL printed by the server, then allow camera access when prompted.
+Open `http://localhost:8000` in a modern browser. Opening `index.html` directly may prevent camera access because browsers restrict camera APIs on insecure `file://` pages.
 
-## Project Structure
+# Run
+1. Open the deployed site or local server URL.
+2. Allow camera access when the browser asks for permission.
+3. Press **START**, complete the short calibration, and keep your gaze on the target.
+4. Use **EYE STYLE** and **SETTINGS** before starting a run when needed.
 
-| File | Purpose |
-| --- | --- |
-| `index.html` | Game interface, navigation, modals, and webcam element |
-| `styles.css` | Responsive doodle-style visual design and game effects |
-| `game.js` | Gaze tracking, calibration, game flow, scoring, and local profiles |
-| `backend.js` | Optional Supabase authentication, run persistence, and leaderboard calls |
-| `supabase-config.js` | Place to add optional Supabase public configuration |
-| `supabase-schema.sql` | Database tables, policies, and leaderboard function |
-| `assets/jumpscare.png` | End-of-round scare graphic |
+### Project Documentation
+For Software:
 
-## How It Works
+# Screenshots
+![Kannum Kannum dashboard](screenshots/Screenshot%202026-09-05%20055803.png)
+*Dashboard view showing the player's current doodle, best run, and quick links. Screenshot captured from the Kannum Kannum application.*
 
-1. The browser requests webcam permission when a game begins.
-2. MediaPipe derives eye-iris and head-position landmarks from the live video.
-3. Calibration records your neutral, center-facing gaze.
-4. During play, the app compares new landmark positions against that baseline.
-5. Looking away or keeping your eyes closed beyond the selected tolerance ends the run and saves the result.
+![Kannum Kannum play screen](screenshots/Screenshot%202026-09-05%20055824.png)
+*Play view showing the gaze target, camera status, score panel, and start controls. Screenshot captured from the Kannum Kannum application.*
 
-## Privacy
+![Kannum Kannum eye collection](screenshots/Screenshot%202026-09-05%20060109.png)
+*Eye Collection view showing the available Human, Cyclops, Anime, and Alien target styles. Screenshot captured from the Kannum Kannum application.*
 
-- Webcam frames are processed in the browser for real-time tracking.
-- The application does not implement video recording or video uploads.
-- In local-only mode, profile data and results stay in your browser's local storage.
-- With Supabase enabled, only account/profile information and score metadata are stored remotely; webcam video is still not uploaded.
+![Kannum Kannum leaderboard](screenshots/Screenshot%202026-09-05%20060119.png)
+*Leaderboard view showing local player scores and the leaderboard rules. Screenshot captured from the Kannum Kannum application.*
 
-## Troubleshooting
+![Kannum Kannum stats](screenshots/Screenshot%202026-09-05%20060129.png)
+*Stats view showing survival time, best level, and total logged runs. Screenshot captured from the Kannum Kannum application.*
 
-| Issue | What to check |
-| --- | --- |
-| The camera does not start | Allow camera permission and open the site through `localhost` or HTTPS, not directly from the file system. |
-| Gaze detection feels inaccurate | Keep your face well lit, stay centered in the preview, and complete calibration while looking at the dot. |
-| Login or leaderboard does not work | Confirm both Supabase values are present in `supabase-config.js` and that `supabase-schema.sql` has been run. |
-| The app stays in local mode | This is expected while `url` and `anonKey` in `supabase-config.js` are empty. |
+![Kannum Kannum game history](screenshots/Screenshot%202026-09-05%20060140.png)
+*Game History view showing recent runs and the reasons each run ended. Screenshot captured from the Kannum Kannum application.*
 
-## Team
+*Image source: screenshots captured by the Kannum Kannum project team and stored in the repository's `screenshots/` directory.*
 
-Built for TinkerHub Useless Projects.
+# Diagrams
+![Kannum Kannum workflow diagram](assets/workflow-diagram.svg)
+*The browser loads the static game, MediaPipe processes camera landmarks locally, and Supabase is used only when online persistence is configured.*
+
+### Project Demo
+# Video
+[Watch the Kannum Kannum demo video](assets/demo.mp4)
+*The demo shows camera calibration, a complete gaze-endurance run, distraction detection, and the score screen.*
+
+# Additional Demos
+[Add the deployed site URL, presentation, or additional demo materials here]
+
+## Team Contributions
+- Neehara Anna Bince: Game concept, interaction design, and frontend implementation
+- Sabarinadh V S: Camera-based gaze detection and gameplay logic. Supabase integration, testing, and deployment
+
+---
+Made with ❤️ at TinkerHub Useless Projects 
+
+![Static Badge](https://img.shields.io/badge/TinkerHub-24?color=%23000000&link=https%3A%2F%2Fwww.tinkerhub.org%2F)
+![Static Badge](https://img.shields.io/badge/UselessProjects--26-26?link=https%3A%2F%2Ftinkerhub.org%2Fevents%2F1M8ORET9A1%2Fuseless-projects-3.0)
