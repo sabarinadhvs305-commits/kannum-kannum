@@ -1,1 +1,225 @@
+<!doctype html>
+<html lang="ml">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>കണ്ണും കണ്ണും | Kannum Kannum - Gaze Endurance Game</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <!-- Background Doodles -->
+      <div class="doodle doodle-eye" aria-hidden="true">◉‿◉</div>
+      <div class="doodle doodle-arrow" aria-hidden="true">↘</div>
+      <div class="doodle doodle-stars" aria-hidden="true">✦ ☆ ✧</div>
+      <div class="doodle doodle-peek doodle-peek-left" aria-hidden="true">👁👁?</div>
+      <div class="doodle doodle-peek doodle-peek-right" aria-hidden="true">👁👁?</div>
+      
+      <div class="bg-eye bg-eye-one" aria-hidden="true"><i></i><i></i></div>
+      <div class="bg-eye bg-eye-two" aria-hidden="true"><i></i><i></i></div>
+      <div class="bg-eye bg-eye-three" aria-hidden="true"><i></i><i></i></div>
+      <div class="bg-eye bg-eye-four" aria-hidden="true"><i></i><i></i></div>
+      <div class="bg-eye bg-eye-five" aria-hidden="true"><i></i><i></i></div>
 
+      <!-- Header Navigation -->
+      <header>
+        <div class="brand">
+          <img
+            class="brand-logo"
+            src="gpt-image-2_create_a_funny_doodle_like_logo_with_title_%E0%B4%95%E0%B4%A3%E0%B5%8D%E0%B4%A3%E0%B5%81%E0%B4%82_%E0%B4%95%E0%B4%A3%E0%B5%8D%E0%B4%A3%E0%B5%81%E0%B4%82-0.jpg"
+            alt="Kannum Kannum logo"
+          />
+        </div>
+        <div class="live mono">
+          <span class="live-dot"></span>
+          <span id="connection">SYSTEM READY</span>
+        </div>
+      </header>
+
+      <nav class="app-nav" aria-label="Game navigation">
+        <button class="nav-link active" data-view="dashboard">DASHBOARD</button>
+        <button class="nav-link" data-view="play">PLAY</button>
+        <button class="nav-link" data-view="collection">EYE COLLECTION</button>
+        <button class="nav-link" data-view="leaderboard">LEADERBOARD</button>
+        <button class="nav-link" data-view="stats">STATS</button>
+        <button class="nav-link" data-view="history">GAME HISTORY</button>
+        <button class="nav-link login-link" id="login-button">LOGIN</button>
+      </nav>
+
+      <!-- Dynamic Views Section -->
+      <section class="portal hidden" id="portal" aria-live="polite">
+        <div class="portal-heading">
+          <span class="eyebrow">KANNUM KANNUM / PLAYER BOOK</span>
+          <h2 id="portal-title">DASHBOARD</h2>
+          <span class="portal-scribble" aria-hidden="true">👁👁</span>
+        </div>
+        <div class="portal-grid" id="portal-content"></div>
+      </section>
+
+      <!-- Main Game Area -->
+      <main>
+        <section class="intro">
+          <div class="eyebrow">A gaze endurance game / 001</div>
+          <img
+            class="landing-logo"
+            src="gpt-image-2_create_a_funny_doodle_like_logo_with_title_%E0%B4%95%E0%B4%A3%E0%B5%8D%E0%B4%A3%E0%B5%81%E0%B4%82_%E0%B4%95%E0%B4%A3%E0%B5%8D%E0%B4%A3%E0%B5%81%E0%B4%82-0.jpg"
+            alt="Kannum Kannum banner"
+          />
+          <div class="subtitle">
+            DON'T LOOK AWAY <span aria-hidden="true">👁👁</span>
+          </div>
+          <p class="intro-copy">
+            Your eyes are the controller. Stare into the center eye while the
+            computer tries very hard to make you curious.
+          </p>
+          <div class="stats">
+            <div class="stat">
+              <label class="mono" for="best-score">Best run</label>
+              <strong id="best-score">0 <small>sec</small></strong>
+            </div>
+            <div class="stat">
+              <label class="mono" for="best-level">Best level</label>
+              <strong id="best-level">0</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="stage-wrap">
+          <div class="game-stage" id="stage">
+            <div class="stage-bar">
+              <span class="round mono" id="round-label">MAIN MENU</span>
+              <span class="score">SCORE <b id="score">000</b></span>
+            </div>
+            <div class="timer hidden" id="timer">00:00.00</div>
+            <div class="target" id="target" data-style="human">
+              <div class="iris"></div>
+              <div class="target-label mono">KEEP LOOKING</div>
+            </div>
+            <div class="zone hidden" id="zone"></div>
+            <div class="gaze-dot hidden" id="gaze-dot"></div>
+            
+            <div class="status-line mono" id="status">
+              CAMERA OFF
+              <div class="meter">
+                <div class="meter-fill" id="meter-fill"></div>
+              </div>
+            </div>
+            
+            <div class="camera-preview">
+              <video id="webcam" autoplay muted playsinline></video>
+            </div>
+
+            <div class="center-message" id="welcome">
+              <div>
+                <div class="eyebrow">KANNUM KANNUM</div>
+                <h2>How long can you keep looking?</h2>
+                <p>
+                  Camera processing stays in this browser. No video is recorded or uploaded.
+                </p>
+                <div class="welcome-actions">
+                  <button class="primary" id="start">
+                    START <span aria-hidden="true">→</span>
+                  </button>
+                  <button class="ghost" id="style-button">EYE STYLE</button>
+                  <button class="ghost" id="settings-button">SETTINGS</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="cal-dot hidden" id="cal-dot"></div>
+            <div class="debug hidden" id="debug"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal hidden" id="login-modal" aria-modal="true" role="dialog">
+      <div class="modal-card login-card">
+        <div class="eyebrow" id="auth-eyebrow">Player pass</div>
+        <h2 id="auth-title">Who is staring?</h2>
+        <p class="intro-copy" id="auth-copy">
+          Create or sign into a local profile. Passwords never leave this browser.
+        </p>
+        
+        <label class="mono" for="player-name">USERNAME</label>
+        <input class="sketch-input" id="player-name" maxlength="18" placeholder="e.g. Eye-vin" />
+        
+        <label class="mono" for="player-email">EMAIL</label>
+        <input class="sketch-input" id="player-email" type="email" placeholder="you@example.com" />
+        
+        <label class="mono" for="player-password">PASSWORD</label>
+        <input class="sketch-input" id="player-password" type="password" minlength="4" placeholder="4+ characters" />
+        
+        <div class="modal-actions">
+          <button class="primary" id="save-login">CREATE PROFILE</button>
+          <button class="ghost" id="switch-auth">I HAVE AN ACCOUNT</button>
+          <button class="ghost" id="close-login">CANCEL</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal hidden" id="style-modal" aria-modal="true" role="dialog">
+      <div class="modal-card">
+        <div class="eyebrow">Target selection</div>
+        <h2>Choose your watcher.</h2>
+        <div class="choices">
+          <button class="choice active" data-eye="human">
+            <i class="choice-eye"></i>HUMAN <small>LVL 1</small>
+          </button>
+          <button class="choice" data-eye="cyclops">
+            <i class="choice-eye"></i>CYCLOPS <small>LVL 2</small>
+          </button>
+          <button class="choice" data-eye="anime">
+            <i class="choice-eye"></i>ANIME <small>LVL 3</small>
+          </button>
+          <button class="choice" data-eye="alien">
+            <i class="choice-eye"></i>ALIEN <small>LVL 5</small>
+          </button>
+        </div>
+        
+        <div class="custom-eye-upload-wrap">
+          <label for="custom-eye-input" class="doodle-btn">Upload Custom Eye</label>
+          <input type="file" id="custom-eye-input" accept="image/*" style="display: none;" />
+        </div>
+
+        <div class="modal-actions">
+          <button class="primary" id="close-style">USE THIS EYE</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal hidden" id="settings-modal" aria-modal="true" role="dialog">
+      <div class="modal-card">
+        <div class="eyebrow">Game settings</div>
+        <h2>Dial the pressure.</h2>
+        
+        <label class="mono" for="tolerance-input">Look-away tolerance</label>
+        <input id="tolerance-input" type="range" min="700" max="2200" step="100" value="1250" />
+        <p class="intro-copy">
+          Longer tolerance is kinder. The center target stays fixed either way.
+        </p>
+
+        <div class="checkbox-group">
+          <input id="debug-input" type="checkbox" />
+          <label class="mono" for="debug-input">DEBUG MODE</label>
+        </div>
+
+        <div class="modal-actions">
+          <button class="primary" id="close-settings">DONE</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Jumpscare Overlay -->
+    <div id="jumpscare-overlay" class="jumpscare-hidden" aria-hidden="true">
+      <img id="jumpscare-img" src="assets/jumpscare.png" alt="Scare graphic" />
+      <div id="jumpscare-eye-container"></div>
+      <button id="btn-share-run" class="doodle-btn secondary-btn">Share Score</button>
+    </div>
+
+    <!-- Scripts -->
+    <script src="supabase-config.js"></script>
+    <script type="module" src="game.js"></script>
+  </body>
+</html>
