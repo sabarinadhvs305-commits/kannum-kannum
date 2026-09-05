@@ -2,8 +2,6 @@
 
 ![Kannum Kannum logo](gpt-image-2_create_a_funny_doodle_like_logo_with_title_%E0%B4%95%E0%B4%A3%E0%B5%8D%E0%B4%A3%E0%B5%81%E0%B4%82_%E0%B4%95%E0%B4%A3%E0%B5%8D%E0%B4%A3%E0%B5%81%E0%B4%82-0.jpg)
 
-# Kannum Kannum
-
 
 ## Basic Details
 ### Team Name: Nisaa
@@ -17,9 +15,7 @@
 ### Project Description
 Kannum Kannum is a gaze-endurance browser game where the player must keep looking at a target while the game tries to distract them. It uses the device camera and MediaPipe face landmarks to detect gaze changes and blinks in real time.
 
-Players can choose different eye styles, adjust the look-away tolerance, view their stats and game history, and share a score after a run. The game works locally with browser storage and can optionally use Supabase for accounts, saved runs, and a shared leaderboard.
-
-### The Problem (that doesn't exist)
+## The Problem (that doesn't exist)
 People keep looking away from screens at the exact moment they are challenged not to. Kannum Kannum turns that familiar lack of focus into a competitive game.
 
 ### The Solution (that nobody asked for)
@@ -45,11 +41,14 @@ For Software:
 # Installation
 This project has no build step or package installation. Clone or download the repository and serve the project directory through a local HTTP server.
 
+
+
 ```bash
 git clone <repository-url>
 cd kannum-kannum
 python -m http.server 8000
 ```
+
 
 Open `http://localhost:8000` in a modern browser. Opening `index.html` directly may prevent camera access because browsers restrict camera APIs on insecure `file://` pages.
 
@@ -75,6 +74,8 @@ For Software:
 ![Kannum Kannum leaderboard](screenshots/Screenshot%202026-09-05%20060119.png)
 *Leaderboard view showing local player scores and the leaderboard rules. Screenshot captured from the Kannum Kannum application.*
 
+
+
 ![Kannum Kannum stats](screenshots/Screenshot%202026-09-05%20060129.png)
 *Stats view showing survival time, best level, and total logged runs. Screenshot captured from the Kannum Kannum application.*
 
@@ -87,6 +88,9 @@ For Software:
 ![Kannum Kannum workflow diagram](assets/workflow-diagram.svg)
 *The browser loads the static game, MediaPipe processes camera landmarks locally, and Supabase is used only when online persistence is configured.*
 
+- Webcam frames are processed in the browser for real-time tracking.
+- The application does not implement video recording or video uploads.
+- Best score and best level stay only in this browser's local storage.
 ### Project Demo
 # Video
 [Watch the Kannum Kannum demo video](assets/demo.mp4)
@@ -95,9 +99,15 @@ For Software:
 # Additional Demos
 [Add the deployed site URL, presentation, or additional demo materials here]
 
+
+| The camera does not start | Allow camera permission and open the site through `localhost` or HTTPS, not directly from the file system. |
+| Gaze detection feels inaccurate | Keep your face well lit, stay centered in the preview, and complete calibration while looking at the dot. |
+| Scores are missing on another device | Best scores are stored only in the current browser and do not sync between devices. |
+
 ## Team Contributions
 - Neehara Anna Bince: Game concept, interaction design, and frontend implementation
 - Sabarinadh V S: Camera-based gaze detection and gameplay logic. Supabase integration, testing, and deployment
+
 
 ---
 Made with ❤️ at TinkerHub Useless Projects 

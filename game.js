@@ -2,15 +2,6 @@ import {
   FaceLandmarker,
   FilesetResolver,
 } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.0.1/vision_bundle.mjs";
-import {
-  backendEnabled,
-  currentBackendProfile,
-  getBackendLeaderboard,
-  loginBackend,
-  logoutBackend,
-  registerBackend,
-  saveBackendRun,
-} from "./backend.js";
 
 const $ = (id) => document.getElementById(id);
 const stage = $("stage"),
@@ -43,11 +34,7 @@ let landmarker,
   blinks = 0,
   lastDistraction = 0,
   toleranceMs = 1250,
-  debugMode = false,
-  currentUser = localStorage.getItem("kk-current-user") || "",
-  authMode = "register";
-
-let remoteProfile = null;
+  debugMode = false;
 
 const messages = [
   "LOOK LEFT.",
@@ -66,87 +53,16 @@ function status(text, color = "var(--muted)") {
 }
 
 function best() {
-  const profile = getProfile();
-  $("best-score").innerHTML = `${profile.bestScore || 0} <small>sec</small>`;
-  $("best-level").textContent = profile.bestLevel || 0;
+  $("best-score").innerHTML = `${getBestScore()} <small>sec</small>`;
+  $("best-level").textContent = getBestLevel();
 }
 
-function getUsers() {
-  return JSON.parse(localStorage.getItem("kk-users") || "{}");
+function getBestScore() {
+  return Number(localStorage.getItem("kk-best-score") || 0);
 }
 
-function getProfile() {
-  if (remoteProfile) return remoteProfile;
-  const users = getUsers();
-  return (
-    users[currentUser] || {
-      name: currentUser || "Anonymous Eye",
-      password: "",
-      bestScore: 0,
-      bestLevel: 0,
-      history: [],
-    }
-  );
-}
-
-function saveProfile(profile) {
-  const users = getUsers();
-  users[profile.name] = profile;
-  localStorage.setItem("kk-users", JSON.stringify(users));
-  currentUser = profile.name;
-  localStorage.setItem("kk-current-user", currentUser);
-}
-
-function getLocalLeaderboard() {
-  return Object.values(getUsers())
-    .map((profile) => ({
-      username: profile.name,
-      best_score: Number(profile.bestScore || 0),
-      best_level: Number(profile.bestLevel || 0),
-    }))
-    .sort(
-      (a, b) =>
-        b.best_score - a.best_score ||
-        b.best_level - a.best_level ||
-        a.username.localeCompare(b.username),
-    )
-    .slice(0, 25);
-}
-
-function leaderboardList(rows) {
-  if (!rows.length) return "<li>No scores yet. Play a round to join.</li>";
-  return rows
-    .map(
-      (row, index) =>
-        `<li>${index + 1}. ${row.username} — ${Number(row.best_score || 0).toFixed(1)}s · Level ${Number(row.best_level || 0)}</li>`,
-    )
-    .join("");
-}
-
-function updateAuthButton() {
-  const button = $("login-button");
-  const loggedIn = Boolean(currentUser);
-  button.textContent = loggedIn ? "LOGOUT" : "LOGIN";
-  button.setAttribute("aria-label", loggedIn ? "Log out" : "Log in");
-}
-
-function requireLogin() {
-  if (currentUser) return true;
-  openAuth("login");
-  return false;
-}
-
-function openAuth(nextMode = "login") {
-  authMode = nextMode;
-  $("login-modal").classList.remove("hidden");
-  $("auth-title").textContent =
-    nextMode === "login" ? "Welcome back, watcher." : "Who is staring?";
-  $("auth-eyebrow").textContent =
-    nextMode === "login" ? "Player login" : "Create player pass";
-  $("save-login").textContent =
-    nextMode === "login" ? "LOGIN" : "CREATE PROFILE";
-  $("switch-auth").textContent =
-    nextMode === "login" ? "CREATE NEW ACCOUNT" : "I HAVE AN ACCOUNT";
+function getBestLevel() {
+  return Number(localStorage.getItem("kk-best-level") || 0);
 }
 
 function rawGaze(result) {
@@ -338,19 +254,11 @@ function gameOver(reason) {
   $("zone").classList.add("hidden");
   $("gaze-dot").classList.add("hidden");
   const seconds = (Date.now() - startedAt) / 1000;
-  const profile = getProfile();
-  profile.bestScore = Math.max(profile.bestScore || 0, Math.floor(seconds));
-  profile.bestLevel = Math.max(profile.bestLevel || 0, level);
-  profile.history = profile.history || [];
-  profile.history.unshift({
-    time: seconds,
-    level,
-    reason,
-    date: new Date().toLocaleDateString(),
-  });
-  profile.history = profile.history.slice(0, 12);
-  saveProfile(profile);
-  saveBackendRun({ time: seconds, level, reason }).catch(() => status("SCORE SYNC FAILED", "var(--coral)"));
+  localStorage.setItem(
+    "kk-best-score",
+    String(Math.max(getBestScore(), Math.floor(seconds))),
+  );
+  localStorage.setItem("kk-best-level", String(Math.max(getBestLevel(), level)));
   updateEyeLocks();
   best();
   audio(130);
@@ -366,42 +274,18 @@ function gameOver(reason) {
 }
 
 function renderPortal(view) {
-  const profile = getProfile();
-  const name = profile.name || "Anonymous Eye";
-  const history = profile.history || [];
-  const bestScore = profile.bestScore || 0;
-  const bestLevel = profile.bestLevel || 0;
+  const bestScore = getBestScore();
+  const bestLevel = getBestLevel();
   const titles = {
-    dashboard: "DASHBOARD",
     collection: "EYE COLLECTION",
-    leaderboard: "LEADERBOARD",
     stats: "STATS",
-    history: "GAME HISTORY",
   };
   const views = {
-    dashboard: `<div class="portal-card dashboard-welcome"><span class="tiny-eye">👀</span><img class="dashboard-poster" src="gpt-image-2_create_a_funny_doodle_like_logo_with_title_%E0%B4%95%E0%B4%A3%E0%B5%8D%E0%B4%A3%E0%B5%81%E0%B4%82_%E0%B4%95%E0%B4%A3%E0%B5%8D%E0%B4%A3%E0%B5%81%E0%B4%82-0.jpg" alt="Kannum Kannum poster" /><h3>Hi, ${name}!</h3><p>Your eyes are warmed up. Ready to cause some chaos?</p><button class="primary portal-play" type="button">PLAY NOW →</button></div><div class="portal-card"><h3>Current doodle</h3><p>Best run</p><strong>${bestScore}s</strong><p>Level ${bestLevel} reached. Suspiciously focused.</p></div><div class="portal-card"><h3>Quick links</h3><ul class="portal-list"><li>Collect weird eyes</li><li>Climb the leaderboard</li><li>Prove you can stare</li></ul></div>`,
     collection: `<div class="portal-card collection-card"><span class="collection-eye human"><i></i></span><h3>Human</h3><p>Classic watcher. Available from level 1.</p><button class="ghost collection-select" data-collection-eye="human">USE THIS EYE</button></div><div class="portal-card collection-card"><span class="collection-eye cyclops"><i></i></span><h3>Cyclops</h3><p>${bestLevel >= 2 ? "Unlocked. One eye, zero excuses." : "Locked. Reach level 2."}</p><button class="ghost collection-select" data-collection-eye="cyclops" ${bestLevel >= 2 ? "" : "disabled"}>${bestLevel >= 2 ? "USE THIS EYE" : "LEVEL 2"}</button></div><div class="portal-card collection-card"><span class="collection-eye anime"><i></i></span><h3>Anime</h3><p>${bestLevel >= 3 ? "Unlocked. Maximum drama." : "Locked. Reach level 3."}</p><button class="ghost collection-select" data-collection-eye="anime" ${bestLevel >= 3 ? "" : "disabled"}>${bestLevel >= 3 ? "USE THIS EYE" : "LEVEL 3"}</button></div><div class="portal-card collection-card"><span class="collection-eye alien"><i></i></span><h3>Alien</h3><p>${bestLevel >= 5 ? "Unlocked. It has seen things." : "Locked. Reach level 5."}</p><button class="ghost collection-select" data-collection-eye="alien" ${bestLevel >= 5 ? "" : "disabled"}>${bestLevel >= 5 ? "USE THIS EYE" : "LEVEL 5"}</button></div>`,
-    leaderboard: `<div class="portal-card"><h3>Local legends</h3><ol class="portal-list">${leaderboardList(getLocalLeaderboard())}</ol></div><div class="portal-card"><h3>Leaderboard rule</h3><p>These scores are from accounts saved in this browser.</p></div>`,
-    stats: `<div class="portal-card"><h3>Survival time</h3><strong>${bestScore}s</strong><p>Your longest eye contact.</p></div><div class="portal-card"><h3>Best level</h3><strong>${bestLevel}</strong><p>The eye remembers.</p></div><div class="portal-card"><h3>Runs logged</h3><strong>${history.length}</strong><p>Every loss is research.</p></div>`,
-    history: history.length
-      ? `<div class="portal-card"><h3>Recent staring</h3><ul class="portal-list">${history.map((run) => `<li>${run.date}: ${run.time.toFixed(1)}s — ${run.reason}</li>`).join("")}</ul></div>`
-      : `<div class="portal-card"><span class="tiny-eye">👀</span><h3>No history yet</h3><p>Play a round and the eyes will write it down.</p></div>`,
+    stats: `<div class="portal-card"><h3>Survival time</h3><strong>${bestScore}s</strong><p>Your longest eye contact on this device.</p></div><div class="portal-card"><h3>Best level</h3><strong>${bestLevel}</strong><p>The eye remembers.</p></div>`,
   };
   $("portal-title").textContent = titles[view];
   $("portal-content").innerHTML = views[view];
-  if (view === "leaderboard" && backendEnabled) {
-    getBackendLeaderboard()
-      .then((rows) => {
-        $("portal-content").innerHTML =
-          `<div class="portal-card"><h3>Shared eye legends</h3><ol class="portal-list">${leaderboardList(rows)}</ol></div><div class="portal-card"><h3>Live leaderboard</h3><p>Scores synced through Supabase.</p></div>`;
-      })
-      .catch(() => {
-        $("portal-content").innerHTML =
-          '<div class="portal-card"><h3>Shared leaderboard unavailable</h3><p>Run the latest <code>supabase-schema.sql</code> in your Supabase SQL editor, then reload.</p></div>';
-      });
-  }
-  const play = $("portal-content").querySelector(".portal-play");
-  if (play) play.onclick = () => setView("play");
   document.querySelectorAll(".collection-select").forEach((button) => {
     button.onclick = () => {
       selectEyeStyle(button.dataset.collectionEye);
@@ -412,14 +296,10 @@ function renderPortal(view) {
 
 function setView(view) {
   const portalViews = [
-    "dashboard",
     "collection",
-    "leaderboard",
     "stats",
-    "history",
   ];
   const isPortal = portalViews.includes(view);
-  if (!requireLogin()) return;
   $("portal").classList.toggle("hidden", !isPortal);
   document.querySelector("main").classList.toggle("hidden", view !== "play");
   document
@@ -436,7 +316,7 @@ function setView(view) {
 
 const unlockLevels = { human: 1, cyclops: 2, anime: 3, alien: 5 };
 function updateEyeLocks() {
-  const reached = getProfile().bestLevel || 0;
+  const reached = Math.max(1, getBestLevel());
   document.querySelectorAll(".choice").forEach((button) => {
     const unlocked = reached >= unlockLevels[button.dataset.eye];
     button.disabled = !unlocked;
@@ -449,79 +329,6 @@ function updateEyeLocks() {
 document
   .querySelectorAll(".nav-link[data-view]")
   .forEach((button) => (button.onclick = () => setView(button.dataset.view)));
-
-$("login-button").onclick = async () => {
-  if (!currentUser) {
-    openAuth("login");
-    return;
-  }
-  try {
-    await logoutBackend();
-  } catch (error) {
-    return status(error.message || "LOGOUT FAILED", "var(--coral)");
-  }
-  currentUser = "";
-  remoteProfile = null;
-  localStorage.removeItem("kk-current-user");
-  updateAuthButton();
-  $("portal").classList.add("hidden");
-  document.querySelector("main").classList.remove("hidden");
-  best();
-  updateEyeLocks();
-  status("LOGGED OUT");
-  openAuth("login");
-};
-
-$("close-login").onclick = () => $("login-modal").classList.add("hidden");
-$("switch-auth").onclick = () =>
-  openAuth(authMode === "login" ? "register" : "login");
-
-$("save-login").onclick = async () => {
-  const value = $("player-name").value.trim();
-  const email = $("player-email").value.trim();
-  const password = $("player-password").value;
-  if (!value || !email || password.length < 6)
-    return status(
-      "USERNAME, EMAIL + 6 CHARACTER PASSWORD REQUIRED",
-      "var(--coral)",
-    );
-  if (backendEnabled) {
-    try {
-      remoteProfile =
-        authMode === "register"
-          ? await registerBackend(email, password, value)
-          : await loginBackend(email, password);
-      currentUser = remoteProfile.name;
-      localStorage.setItem("kk-current-user", currentUser);
-    } catch (error) {
-      return status(error.message || "BACKEND LOGIN FAILED", "var(--coral)");
-    }
-  }
-  const users = getUsers();
-  if (authMode === "register") {
-    if (users[value] && !backendEnabled)
-      return status("THAT USERNAME IS TAKEN", "var(--coral)");
-    saveProfile({
-      name: value,
-      password,
-      bestScore: 0,
-      bestLevel: 1,
-      history: [],
-    });
-  } else {
-    if (
-      !backendEnabled &&
-      (!users[value] || users[value].password !== password)
-    )
-      return status("WRONG USERNAME OR PASSWORD", "var(--coral)");
-    saveProfile(users[value]);
-  }
-  $("login-modal").classList.add("hidden");
-  updateAuthButton();
-  updateEyeLocks();
-  renderPortal("dashboard");
-  setView("dashboard");
-};
 
 async function calibrate() {
   mode = "calibrating";
@@ -589,16 +396,31 @@ async function calibrate() {
 }
 
 async function begin() {
-  if (!requireLogin()) return;
+  if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
+    $("connection").textContent = "HTTPS REQUIRED";
+    status("OPEN THROUGH LOCALHOST OR HTTPS", "var(--coral)");
+    $("welcome").querySelector("p").textContent =
+      "Camera access is blocked when this file is opened directly. Run it on localhost or deploy it to an HTTPS site, then try again.";
+    return;
+  }
+
   $("start").disabled = true;
   $("start").textContent = "OPENING CAMERA...";
   try {
-    if (!stream) {
+    const cameraStopped = stream?.getVideoTracks().every((track) => track.readyState === "ended");
+    if (!stream || cameraStopped) {
       stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "user", width: 640, height: 480 },
+        video: {
+          facingMode: { ideal: "user" },
+          width: { ideal: 640 },
+          height: { ideal: 480 },
+        },
         audio: false,
       });
       video.srcObject = stream;
+      await new Promise((resolve) => {
+        video.onloadedmetadata = resolve;
+      });
       await video.play();
     }
     $("connection").textContent = "CAMERA ONLINE";
@@ -624,11 +446,17 @@ async function begin() {
     await calibrate();
   } catch (e) {
     console.error(e);
-    $("connection").textContent = "CAMERA NEEDED";
-    status("CAMERA BLOCKED", "var(--coral)");
+    const denied = e.name === "NotAllowedError" || e.name === "SecurityError";
+    const missing = e.name === "NotFoundError" || e.name === "OverconstrainedError";
+    $("connection").textContent = denied ? "CAMERA BLOCKED" : "CAMERA UNAVAILABLE";
+    status(denied ? "ALLOW CAMERA ACCESS" : "CAMERA NOT FOUND", "var(--coral)");
     $("welcome").classList.remove("hidden");
     $("welcome").querySelector("p").textContent =
-      "Face tracking needs camera permission. Allow access, sit in front of the camera, then try again.";
+      denied
+        ? "Allow camera permission for this site in your browser settings, then try again."
+        : missing
+          ? "No usable camera was found. Connect or enable a camera, then try again."
+          : "The camera could not start. Close other apps using it, then try again.";
     $("start").disabled = false;
     $("start").textContent = "TRY CAMERA AGAIN →";
   }
@@ -682,31 +510,6 @@ $("close-settings").onclick = () => {
 bindMenu();
 best();
 updateEyeLocks();
-updateAuthButton();
-
-if (backendEnabled) {
-  currentUser = "";
-  localStorage.removeItem("kk-current-user");
-  updateAuthButton();
-  openAuth("login");
-  currentBackendProfile()
-    .then((profile) => {
-      if (!profile) return;
-      remoteProfile = profile;
-      currentUser = profile.name;
-      localStorage.setItem("kk-current-user", currentUser);
-      updateAuthButton();
-      updateEyeLocks();
-      best();
-      $("login-modal").classList.add("hidden");
-      setView("dashboard");
-    })
-    .catch(() => {});
-} else if (currentUser) {
-  setView("dashboard");
-} else {
-  openAuth("login");
-}
 
 setInterval(distract, 900);
 
